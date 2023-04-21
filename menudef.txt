@@ -1,0 +1,56 @@
+AddOptionMenu "OptionsMenu"
+{
+	Submenu "CrosshairHP Options", "CHP_Options"
+}
+
+OptionMenu "CHP_Options"
+{
+	Title "CrosshairHP Options"
+	Option "Show CrosshairHP", "chp_visible", "CHP_YesNo"
+	StaticText ""
+	StaticText "General Options", 1
+	Slider "Fade Time in Seconds", "chp_fade", 0.0, 1.5, 0.1, 2
+	Slider "Opacity Percentage", "chp_opacity", 10, 100, 1, 0
+	Option "Show Actor Names", "chp_showname", "CHP_YesNo"
+	Option "Show Destructible Object HP", "chp_showall", "CHP_YesNo"
+	Option "Show Health Percentage", "chp_showpercentage", "CHP_YesNo"
+	Option "Show Hidden Monsters", "chp_showhidden", "CHP_YesNo"
+	Option "Size Adjustment", "chp_size", "CHP_Size"
+	StaticText ""
+	StaticText "Position Options", 1
+	StaticText "You can specify a custom position"
+	StaticText "for CrosshairHP below. Note that it's"
+	StaticText "not possible to exceed the boundries"
+	StaticText "of the current resolution."
+	StaticText ""
+	Option "Position Preset", "chp_position", "CHP_Position"
+	StaticText ""
+	StaticText "If the chosen preset is custom, you"
+	StaticText "can further tweak the position below."
+	StaticText ""
+	Slider "Horizontal Position", "chp_x", 0, 3840, 1, 0
+	Slider "Vertical Position", "chp_y", 0, 2160, 1, 0
+}
+
+OptionValue "CHP_Position"
+{
+	0, "Custom"
+	1, "Top"
+	2, "Above Crosshair"
+	3, "At Crosshair"
+	4, "Below Crosshair"
+	5, "Bottom"
+}
+
+OptionValue "CHP_Size"
+{
+	0, "None"
+	1, "Double"
+	2, "Triple"
+}
+
+OptionValue "CHP_YesNo"
+{
+	0, "No"
+	1, "Yes"
+}

@@ -1,0 +1,58 @@
+/*------------------------\
+   CrosshairHP by Tekish
+\------------------------*/
+
+class crosshairhpbridge
+{
+	play private static int trace(float range, int playernumber)
+	{
+		playerinfo player = players[playernumber];
+		actor target = player.mo.aimtarget();
+
+		if (!target)
+		{
+			flinetracedata lineray;
+			player.mo.linetrace(player.mo.angle, range, player.mo.pitch, 0, player.viewheight, 0.0, 0.0, lineray);
+			target = lineray.hitactor;
+		}
+
+		bool showall = cvar.getcvar("chp_showall", player).getint();
+		bool showhidden = cvar.getcvar("chp_showhidden", player).getint();
+		int health;
+
+		if (target && target.bSHOOTABLE && (showall || (!showall && ((!deathmatch && target.bCOUNTKILL && target.bISMONSTER) || (target.player && target.player.mo && !target.isteammate(player.mo))) && (showhidden || (!target.bSHADOW && !target.bSTEALTH)))))
+		{
+			int maxhealth;
+			string text;
+
+			if (target.player && target.player.mo)
+			{
+				maxhealth = target.player.mo.getmaxhealth();
+				text = target.player.getusername();
+			}
+			else
+			{
+				maxhealth = target.spawnhealth();
+				text = target.gettag();
+			}
+
+			health = target.health;
+			cvar.getcvar("chp_bridge_maxhealth", player).setint(maxhealth);
+
+			if (cvar.getcvar("chp_showname", player).getint())
+				cvar.getcvar("chp_bridge_name", player).setstring(text);
+		}
+
+		return health;
+	}
+
+	ui private static int getconsoleplayer()
+	{
+		return consoleplayer;
+	}
+
+	ui private static int gettop()
+	{
+		return statusbar.gettopofstatusbar();
+	}
+}

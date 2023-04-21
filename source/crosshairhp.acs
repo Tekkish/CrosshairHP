@@ -1,0 +1,251 @@
+/*------------------------\
+   CrosshairHP by Tekish
+\------------------------*/
+
+#library "crosshairhp"
+#include "zcommon.acs"
+
+#define CHP_BASECOLOR	CR_GRAY
+#define CHP_FLAGS		HUDMSG_FADEOUT | HUDMSG_ALPHA | HUDMSG_NOTWITHFULLMAP | HUDMSG_NOTWITHOVERLAYMAP | HUDMSG_NOWRAP
+#define CHP_ID_BAR		160200
+#define CHP_ID_LEFT		CHP_ID_BAR + 100
+#define CHP_ID_RIGHT	CHP_ID_LEFT + 1
+#define CHP_ID_NAME		CHP_ID_RIGHT + 1
+#define CHP_ID_BARINT	CHP_ID_NAME + 1
+#define CHP_ID_BAREXT	CHP_ID_BARINT + 1
+#define CHP_RANGE		8192.0
+#define CHP_REFRESH		1
+#define CHP_TICRATE		35
+#define CHP_TIME		(CHP_REFRESH << 16) / CHP_TICRATE + 1
+
+/*-------\
+   Core
+\-------*/
+
+function void crosshairhp(void)
+{
+	if (getcvar("chp_visible"))
+	{
+		int health = scriptcall("crosshairhpbridge", "trace", CHP_RANGE, scriptcall("crosshairhpbridge", "getconsoleplayer"));
+
+		if (health > 0)
+		{
+			bool showname = getcvar("chp_showname");
+			int height = getscreenheight();
+			int position = getcvar("chp_position");
+			int size = getcvar("chp_size");
+			int width = getscreenwidth();
+			int x = getcvar("chp_x");
+			int y = getcvar("chp_y");
+
+			if (position == 0)
+			{
+				if (x < 0)
+					x = 0;
+				else if (x > width)
+					x = width;
+
+				if (y < 0)
+					y = 0;
+				else if (y > height)
+					y = height;
+			}
+			else
+			{
+				int offset, offsetname, offsetshowname, statusbar;
+
+				switch (size)
+				{
+					case 1:
+						offset = 0.0045;
+						offsetname = 19.0;
+						break;
+
+					case 2:
+						offset = 0.00835;
+						offsetname = 29.0;
+						break;
+
+					default:
+						offsetname = 9.0;
+				}
+
+				if (showname)
+					offsetshowname = offsetname;
+
+				if (getcvar("screenblocks") < 11)
+					statusbar = height - scriptcall("crosshairhpbridge", "gettop");
+
+				x = fixeddiv(width << 16, 2.0) >> 16;
+
+				switch (position)
+				{
+					case 1:
+						y = fixedmul(height - statusbar << 16, 0.05 + offset) + 0.5 >> 16;
+						break;
+
+					case 2:
+						y = fixedmul(height - statusbar << 16, 0.25 + offset) + 0.5 >> 16;
+						break;
+
+					case 4:
+						y = fixedmul(height - statusbar << 16, 0.75 - offset) - offsetshowname >> 16;
+						break;
+
+					case 5:
+						y = fixedmul(height - statusbar << 16, 0.95 - offset) - offsetshowname >> 16;
+						break;
+
+					default:
+						y = fixedmul(height - statusbar << 16, 0.54 + offset) >> 16;
+				}
+			}
+
+			x = x << 16;
+			y = y << 16;
+
+			int maxhealth = getcvar("chp_bridge_maxhealth");
+
+			if (health > maxhealth)
+				maxhealth = health;
+
+			int percentage = 100 * health / maxhealth;
+
+			if (percentage < 1)
+				percentage = 1;
+
+			int color;
+
+			if (percentage >= 75)
+				color = CR_GREEN;
+			else if (percentage >= 50)
+				color = CR_YELLOW;
+			else if (percentage >= 25)
+				color = CR_ORANGE;
+			else
+				color = CR_RED;
+
+			str rightinfo = "";
+
+			if (getcvar("chp_showpercentage"))
+				rightinfo = strparam(d:percentage, s:"%");
+			else
+				rightinfo = strparam(d:maxhealth);
+
+			int opacity = getcvar("chp_opacity");
+
+			if (opacity < 10 || opacity > 100)
+				opacity = 100;
+
+			opacity = fixeddiv(opacity << 16, 100.0);
+
+			int opacitybar = fixeddiv(opacity, 2.0);
+			int fade = getcvar("chp_fade");
+
+			if (fade < 0 || fade > 1.5)
+				fade = 0.25;
+
+			int xbar, xbarfactor, xleft, xright, ybar, yname;
+			str barfont = "", font = "";
+
+			switch (size)
+			{
+				case 2:
+					barfont = "crosshairhpbar3";
+					font = "CHPFONT3";
+					xbar = x - 78.0;
+					xbarfactor = 3.0;
+					ybar = y + 9.0;
+					xleft = x - 94.4;
+					xright = x + 96.5;
+					yname = y + 32.0;
+					break;
+
+				case 1:
+					barfont = "crosshairhpbar2";
+					font = "CHPFONT2";
+					xbar = x - 52.0;
+					xbarfactor = 2.0;
+					ybar = y + 6.0;
+					xleft = x - 62.4;
+					xright = x + 63.5;
+					yname = y + 21.0;
+					break;
+
+				default:
+					barfont = "crosshairhpbar";
+					font = "CHPFONT";
+					xbar = x - 26.0;
+					xbarfactor = 1.0;
+					ybar = y + 3.0;
+					xleft = x - 30.4;
+					xright = x + 32.5;
+					yname = y + 10.0;
+			}
+
+			setfont(font);
+			sethudsize(width, height, true);
+			hudmessage(d:health; CHP_FLAGS, CHP_ID_LEFT, color, xleft, y, CHP_TIME, fade, opacity);
+			hudmessage(s:rightinfo; CHP_FLAGS, CHP_ID_RIGHT, CHP_BASECOLOR, xright, y, CHP_TIME, fade, opacity);
+
+			if (showname)
+				hudmessage(s:getcvarstring("chp_bridge_name"); CHP_FLAGS, CHP_ID_NAME, CHP_BASECOLOR, x, yname, CHP_TIME, fade, opacity);
+
+			int a, b;
+			int bar = fixeddiv(percentage << 16, 2.0) >> 16;
+
+			setfont(barfont);
+			hudmessage(s:"+"; CHP_FLAGS, CHP_ID_BARINT, CR_BLACK, x, ybar, CHP_TIME, fade, opacitybar);
+			hudmessage(s:"="; CHP_FLAGS, CHP_ID_BAREXT, CHP_BASECOLOR, x, y, CHP_TIME, fade, opacity);
+
+			if (bar < 1)
+				bar = 1;
+
+			for (a = 0; a <= bar; a++)
+			{
+				if (bar <= 0)
+					break;
+
+				b = b + xbarfactor;
+				hudmessage(s:"-"; CHP_FLAGS, CHP_ID_BAR + a, color, xbar + b, ybar, CHP_TIME, fade, opacity);
+			}
+		}
+	}
+}
+
+script "crosshairhp" (void)
+{
+	crosshairhp();
+	delay(CHP_REFRESH);
+	restart;
+}
+
+script "crosshairhpdeath" DEATH
+{
+	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
+		terminate;
+
+	acs_namedterminate("crosshairhp", 0);
+}
+
+script "crosshairhpenter" ENTER
+{
+	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
+		terminate;
+
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
+		terminate;
+
+	acs_namedexecute("crosshairhp", 0);
+}
+
+script "crosshairhprespawn" RESPAWN
+{
+	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
+		terminate;
+
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
+		terminate;
+
+	acs_namedexecute("crosshairhp", 0);
+}

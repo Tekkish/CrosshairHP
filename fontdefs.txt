@@ -1,0 +1,20 @@
+crosshairhpbar
+{
+	- CHPBAR0
+	+ CHPBAR1
+	= CHPBAR2
+}
+
+crosshairhpbar2
+{
+	- CHPBAR3
+	+ CHPBAR4
+	= CHPBAR5
+}
+
+crosshairhpbar3
+{
+	- CHPBAR6
+	+ CHPBAR7
+	= CHPBAR8
+}

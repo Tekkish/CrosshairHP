@@ -1,0 +1,14 @@
+user bool chp_showall = false;
+user bool chp_showhidden = true;
+user bool chp_showname = false;
+user bool chp_showpercentage = true;
+user bool chp_visible = true;
+user float chp_fade = 0.25;
+user int chp_opacity = 70;
+user int chp_position = 3;
+user int chp_size = 0;
+user int chp_x = 0;
+user int chp_y = 0;
+
+user noarchive int chp_bridge_maxhealth;
+user noarchive string chp_bridge_name;
