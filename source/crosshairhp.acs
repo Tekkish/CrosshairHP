@@ -236,7 +236,7 @@ script "crosshairhpenter" ENTER
 	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
 		terminate;
 
-	acs_namedexecute("crosshairhp", 0);
+	acs_namedexecutewithresult("crosshairhp", 0);
 }
 
 script "crosshairhprespawn" RESPAWN
@@ -247,5 +247,5 @@ script "crosshairhprespawn" RESPAWN
 	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
 		terminate;
 
-	acs_namedexecute("crosshairhp", 0);
+	acs_namedexecutewithresult("crosshairhp", 0);
 }
