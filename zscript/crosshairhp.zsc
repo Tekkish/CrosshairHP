@@ -16,8 +16,8 @@ class crosshairhpbridge
 			target = lineray.hitactor;
 		}
 
-		bool showall = cvar.getcvar("chp_showall", player).getint();
-		bool showhidden = cvar.getcvar("chp_showhidden", player).getint();
+		bool showall = cvar.getcvar("chp_showall", player).getbool();
+		bool showhidden = cvar.getcvar("chp_showhidden", player).getbool();
 		int health;
 
 		if (target && target.bSHOOTABLE && (showall || (!showall && ((!deathmatch && target.bCOUNTKILL && target.bISMONSTER) || (target.player && target.player.mo && !target.isteammate(player.mo))) && (showhidden || (!target.bSHADOW && !target.bSTEALTH)))))
@@ -39,7 +39,7 @@ class crosshairhpbridge
 			health = target.health;
 			cvar.getcvar("chp_bridge_maxhealth", player).setint(maxhealth);
 
-			if (cvar.getcvar("chp_showname", player).getint())
+			if (cvar.getcvar("chp_showname", player).getbool())
 				cvar.getcvar("chp_bridge_name", player).setstring(text);
 		}
 
