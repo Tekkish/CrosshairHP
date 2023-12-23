@@ -230,10 +230,7 @@ script "crosshairhpdeath" DEATH
 
 script "crosshairhpenter" ENTER
 {
-	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
-		terminate;
-
-	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer") || scriptcall("crosshairhpbridge", "getnoautosavehint"))
 		terminate;
 
 	acs_namedexecutewithresult("crosshairhp", 0);
@@ -241,10 +238,7 @@ script "crosshairhpenter" ENTER
 
 script "crosshairhprespawn" RESPAWN
 {
-	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
-		terminate;
-
-	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)))
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer") || scriptcall("crosshairhpbridge", "getnoautosavehint"))
 		terminate;
 
 	acs_namedexecutewithresult("crosshairhp", 0);
