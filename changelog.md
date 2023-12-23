@@ -1,3 +1,6 @@
+## December 23, 2023 (v1.23)
+- The add-on no longer starts on intro or demo styled maps.
+
 ## October 24, 2023 (v1.22)
 - Minor code changes.
 
