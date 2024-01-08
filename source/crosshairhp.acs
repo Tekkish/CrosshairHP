@@ -19,6 +19,8 @@
 #define CHP_TICRATE		35
 #define CHP_TIME		(CHP_REFRESH << 16) / CHP_TICRATE + 1
 
+bool killswitch;
+
 /*------------\
    Functions
 \------------*/
@@ -230,17 +232,15 @@ function void crosshairhp(void)
 
 script "crosshairhp" (void)
 {
+	if (scriptcall(CHP_BRIDGE, "getdeath"))
+	{
+		killswitch = true;
+		terminate;
+	}
+
 	crosshairhp();
 	delay(CHP_REFRESH);
 	restart;
-}
-
-script "crosshairhpdeath" DEATH
-{
-	if (playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer"))
-		terminate;
-
-	acs_namedterminate("crosshairhp", 0);
 }
 
 script "crosshairhpenter" ENTER
@@ -253,8 +253,12 @@ script "crosshairhpenter" ENTER
 
 script "crosshairhprespawn" RESPAWN
 {
-	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer") || scriptcall(CHP_BRIDGE, "getnoautosavehint"))
+	if (playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer") || scriptcall(CHP_BRIDGE, "getnoautosavehint"))
 		terminate;
 
-	acs_namedexecutewithresult("crosshairhp", 0);
+	if (killswitch)
+	{
+		killswitch = false;
+		acs_namedexecutewithresult("crosshairhp", 0);
+	}
 }
