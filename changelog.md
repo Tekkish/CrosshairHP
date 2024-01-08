@@ -1,3 +1,6 @@
+## January 7, 2024 (v1.24)
+- Fixed an issue that could cause the add-on to stop working after unmorphing.
+
 ## December 23, 2023 (v1.23)
 - The add-on no longer starts on intro or demo styled maps.
 

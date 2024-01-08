@@ -6,6 +6,7 @@
 #include "zcommon.acs"
 
 #define CHP_BASECOLOR	CR_GRAY
+#define CHP_BRIDGE		"crosshairhpbridge"
 #define CHP_FLAGS		HUDMSG_FADEOUT | HUDMSG_ALPHA | HUDMSG_NOTWITHFULLMAP | HUDMSG_NOTWITHOVERLAYMAP | HUDMSG_NOWRAP
 #define CHP_ID_BAR		160200
 #define CHP_ID_LEFT		CHP_ID_BAR + 100
@@ -18,25 +19,39 @@
 #define CHP_TICRATE		35
 #define CHP_TIME		(CHP_REFRESH << 16) / CHP_TICRATE + 1
 
+/*------------\
+   Functions
+\------------*/
+
+function int getcvarplayer(str cvar)
+{
+	return getusercvar(scriptcall(CHP_BRIDGE, "getconsoleplayer"), cvar);
+}
+
+function str getcvarplayerstring(str cvar)
+{
+	return getusercvarstring(scriptcall(CHP_BRIDGE, "getconsoleplayer"), cvar);
+}
+
 /*-------\
    Core
 \-------*/
 
 function void crosshairhp(void)
 {
-	if (getcvar("chp_visible"))
+	if (getcvarplayer("chp_visible"))
 	{
-		int health = scriptcall("crosshairhpbridge", "trace", CHP_RANGE, scriptcall("crosshairhpbridge", "getconsoleplayer"));
+		int health = scriptcall(CHP_BRIDGE, "trace", CHP_RANGE, scriptcall(CHP_BRIDGE, "getconsoleplayer"));
 
 		if (health > 0)
 		{
-			bool showname = getcvar("chp_showname");
+			bool showname = getcvarplayer("chp_showname");
 			int height = getscreenheight();
-			int position = getcvar("chp_position");
-			int size = getcvar("chp_size");
+			int position = getcvarplayer("chp_position");
+			int size = getcvarplayer("chp_size");
 			int width = getscreenwidth();
-			int x = getcvar("chp_x");
-			int y = getcvar("chp_y");
+			int x = getcvarplayer("chp_x");
+			int y = getcvarplayer("chp_y");
 
 			if (position == 0)
 			{
@@ -74,7 +89,7 @@ function void crosshairhp(void)
 					offsetshowname = offsetname;
 
 				if (getcvar("screenblocks") < 11)
-					statusbar = height - scriptcall("crosshairhpbridge", "gettop");
+					statusbar = height - scriptcall(CHP_BRIDGE, "gettop");
 
 				x = fixeddiv(width << 16, 2.0) >> 16;
 
@@ -104,7 +119,7 @@ function void crosshairhp(void)
 			x = x << 16;
 			y = y << 16;
 
-			int maxhealth = getcvar("chp_bridge_maxhealth");
+			int maxhealth = getcvarplayer("chp_bridge_maxhealth");
 
 			if (health > maxhealth)
 				maxhealth = health;
@@ -127,12 +142,12 @@ function void crosshairhp(void)
 
 			str rightinfo = "";
 
-			if (getcvar("chp_showpercentage"))
+			if (getcvarplayer("chp_showpercentage"))
 				rightinfo = strparam(d:percentage, s:"%");
 			else
 				rightinfo = strparam(d:maxhealth);
 
-			int opacity = getcvar("chp_opacity");
+			int opacity = getcvarplayer("chp_opacity");
 
 			if (opacity < 10 || opacity > 100)
 				opacity = 100;
@@ -140,7 +155,7 @@ function void crosshairhp(void)
 			opacity = fixeddiv(opacity << 16, 100.0);
 
 			int opacitybar = fixeddiv(opacity, 2.0);
-			int fade = getcvar("chp_fade");
+			int fade = getcvarplayer("chp_fade");
 
 			if (fade < 0 || fade > 1.5)
 				fade = 0.25;
@@ -189,7 +204,7 @@ function void crosshairhp(void)
 			hudmessage(s:rightinfo; CHP_FLAGS, CHP_ID_RIGHT, CHP_BASECOLOR, xright, y, CHP_TIME, fade, opacity);
 
 			if (showname)
-				hudmessage(s:getcvarstring("chp_bridge_name"); CHP_FLAGS, CHP_ID_NAME, CHP_BASECOLOR, x, yname, CHP_TIME, fade, opacity);
+				hudmessage(s:getcvarplayerstring("chp_bridge_name"); CHP_FLAGS, CHP_ID_NAME, CHP_BASECOLOR, x, yname, CHP_TIME, fade, opacity);
 
 			int a, b;
 			int bar = fixeddiv(percentage << 16, 2.0) >> 16;
@@ -222,7 +237,7 @@ script "crosshairhp" (void)
 
 script "crosshairhpdeath" DEATH
 {
-	if (playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer"))
+	if (playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer"))
 		terminate;
 
 	acs_namedterminate("crosshairhp", 0);
@@ -230,7 +245,7 @@ script "crosshairhpdeath" DEATH
 
 script "crosshairhpenter" ENTER
 {
-	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer") || scriptcall("crosshairhpbridge", "getnoautosavehint"))
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer") || scriptcall(CHP_BRIDGE, "getnoautosavehint"))
 		terminate;
 
 	acs_namedexecutewithresult("crosshairhp", 0);
@@ -238,7 +253,7 @@ script "crosshairhpenter" ENTER
 
 script "crosshairhprespawn" RESPAWN
 {
-	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall("crosshairhpbridge", "getconsoleplayer") || scriptcall("crosshairhpbridge", "getnoautosavehint"))
+	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer") || scriptcall(CHP_BRIDGE, "getnoautosavehint"))
 		terminate;
 
 	acs_namedexecutewithresult("crosshairhp", 0);
