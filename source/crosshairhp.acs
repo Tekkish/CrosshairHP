@@ -20,6 +20,7 @@
 #define CHP_TIME		(CHP_REFRESH << 16) / CHP_TICRATE + 1
 
 bool killswitch;
+int consoleplayer;
 
 /*------------\
    Functions
@@ -27,12 +28,12 @@ bool killswitch;
 
 function int getcvarplayer(str cvar)
 {
-	return getusercvar(scriptcall(CHP_BRIDGE, "getconsoleplayer"), cvar);
+	return getusercvar(consoleplayer, cvar);
 }
 
 function str getcvarplayerstring(str cvar)
 {
-	return getusercvarstring(scriptcall(CHP_BRIDGE, "getconsoleplayer"), cvar);
+	return getusercvarstring(consoleplayer, cvar);
 }
 
 /*-------\
@@ -43,7 +44,7 @@ function void crosshairhp(void)
 {
 	if (getcvarplayer("chp_visible"))
 	{
-		int health = scriptcall(CHP_BRIDGE, "trace", CHP_RANGE, scriptcall(CHP_BRIDGE, "getconsoleplayer"));
+		int health = scriptcall(CHP_BRIDGE, "trace", CHP_RANGE, consoleplayer);
 
 		if (health > 0)
 		{
@@ -238,6 +239,7 @@ script "crosshairhp" (void)
 		terminate;
 	}
 
+	consoleplayer = scriptcall(CHP_BRIDGE, "getconsoleplayer");
 	crosshairhp();
 	delay(CHP_REFRESH);
 	restart;
