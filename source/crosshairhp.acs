@@ -250,7 +250,7 @@ script "crosshairhpenter" ENTER
 	if (!strcmp("TITLEMAP", strparam(n:PRINTNAME_LEVEL)) || playernumber() != scriptcall(CHP_BRIDGE, "getconsoleplayer") || scriptcall(CHP_BRIDGE, "getnoautosavehint"))
 		terminate;
 
-	acs_namedexecutewithresult("crosshairhp", 0);
+	acs_namedexecutewithresult("crosshairhp");
 }
 
 script "crosshairhprespawn" RESPAWN
@@ -261,6 +261,6 @@ script "crosshairhprespawn" RESPAWN
 	if (killswitch)
 	{
 		killswitch = false;
-		acs_namedexecutewithresult("crosshairhp", 0);
+		acs_namedexecutewithresult("crosshairhp");
 	}
 }
