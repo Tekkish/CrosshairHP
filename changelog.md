@@ -1,3 +1,6 @@
+## March 27, 2025 (v1.27)
+- Added support for language translations.
+
 ## January 14, 2024 (v1.26)
 - Minor performance optimizations.
 
